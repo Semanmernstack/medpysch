@@ -1,0 +1,57 @@
+import { DocumentProcessor } from '../lib/data/document-processor';
+import { MedicalVectorStore } from '../lib/data/vectorstore';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config({ path: '.env.local' });
+
+async function uploadDocuments() {
+  console.log('═══════════════════════════════════════════════════');
+  console.log('📚 MEDICAL DOCUMENTS UPLOAD TO PINECONE');
+  console.log('═══════════════════════════════════════════════════\n');
+
+  try {
+    // Step 1: Process PDFs
+    console.log('STEP 1: Processing PDF documents...\n');
+    const processor = new DocumentProcessor();
+    const documents = await processor.processAllDocuments();
+
+    if (documents.length === 0) {
+      console.log('\n⚠️  No documents to upload!');
+      console.log('\n📌 To add documents:');
+      console.log('   1. Create folder: data/medical-documents/');
+      console.log('   2. Add your PDFs: pp.pdf, jj.pdf, etc.');
+      console.log('   3. Run this script again\n');
+      return;
+    }
+
+    // Step 2: Show statistics
+    console.log('\nSTEP 2: Document Statistics\n');
+    const stats = processor.getDocumentStats(documents);
+    console.log(`📊 Statistics:`);
+    console.log(`   • Total documents: ${stats.totalDocuments}`);
+    console.log(`   • Total characters: ${stats.totalCharacters.toLocaleString()}`);
+    console.log(`   • Average size: ${stats.averageSize.toLocaleString()} chars`);
+    console.log(`   • Specialties: ${stats.specialties.join(', ')}`);
+
+    // Step 3: Upload to Pinecone
+    console.log('\n\nSTEP 3: Uploading to Pinecone...\n');
+    const vectorStore = new MedicalVectorStore();
+    await vectorStore.uploadDocuments(documents);
+
+    // Step 4: Success message
+    console.log('\n═══════════════════════════════════════════════════');
+    console.log('✅ UPLOAD COMPLETE!');
+    console.log('═══════════════════════════════════════════════════\n');
+    console.log('Your medical documents are now searchable in Pinecone!');
+    console.log('\nNext steps:');
+    console.log('  • Run: npm run test-search (to test RAG)');
+    console.log('  • Start app: npm run dev');
+    console.log('  • Begin examinations!\n');
+  } catch (error) {
+    console.error('\n Upload failed:', error);
+    process.exit(1);
+  }
+}
+
+uploadDocuments();
