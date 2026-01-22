@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { medicalCases } from '@/app/lib/data/medical-cases';
 import { NextResponse } from 'next/server';
 
