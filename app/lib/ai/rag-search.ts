@@ -106,7 +106,7 @@ const pc = new Pinecone({
 });
 
 const embeddings = new HuggingFaceInferenceEmbeddings({
-  apiKey: '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',
+  apiKey: ' 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',
   model: 'sentence-transformers/all-MiniLM-L6-v2',
 });
 
