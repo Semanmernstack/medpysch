@@ -1,40 +1,4 @@
 
-// import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/hf";
-// import { PineconeStore } from '@langchain/pinecone';
-// import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-// import { Document } from "@langchain/core/documents";
-// import { getPineconeIndex } from './pinecone';
-
-// // Create the cloud-based embedding instance
-// // You can get a free token at hf.co/settings/tokens
-// const embeddings = new HuggingFaceInferenceEmbeddings({
-//   apiKey: process.env.HUGGINGFACEHUB_API_KEY, 
-//   model: "sentence-transformers/all-MiniLM-L6-v2", // 384 dimensions
-// });
-
-// export async function initializeVectorStore() {
-//   const pineconeIndex = await getPineconeIndex();
-//   return await PineconeStore.fromExistingIndex(embeddings, {
-//     pineconeIndex,
-//     namespace: '',
-//   });
-// }
-
-// export async function indexDocuments(documents: Document[]): Promise<void> {
-//   const splitter = new RecursiveCharacterTextSplitter({
-//     chunkSize: 500,
-//     chunkOverlap: 20,
-//   });
-
-//   const chunkedDocs = await splitter.splitDocuments(documents);
-//   const pineconeIndex = await getPineconeIndex();
-
-//   // This call sends data to Hugging Face's Cloud, then to Pinecone
-//   await PineconeStore.fromDocuments(chunkedDocs, embeddings, {
-//     pineconeIndex,
-//     namespace: '',
-//   });
-// }
 import { Document } from "@langchain/core/documents";
 import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/hf";
 import { PineconeStore } from '@langchain/pinecone';

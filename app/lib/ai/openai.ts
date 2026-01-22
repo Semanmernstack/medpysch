@@ -1,10 +1,12 @@
 
+
+
 // import OpenAI from 'openai';
 
-// // Fallback to hardcoded key if environment variable isn't loaded
-// // This is a workaround for Next.js environment variable loading issues on Windows
+// // Hardcoded API kjey - no environment variables
 // const openai = new OpenAI({
-//   apiKey: process.env.OPENAI_API_KEY || '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',
+//  //apiKey: "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"
+//   apiKey: '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',
 // });
 
 // export async function chat(
@@ -65,16 +67,15 @@
 // export { openai };
 import OpenAI from 'openai';
 
-// Hardcoded API kjey - no environment variables
+// Initialize OpenAI with environment variable
 const openai = new OpenAI({
- //apiKey: "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"
-  apiKey: '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',
+  apiKey: process.env.OPENAI_API_KEY!,
 });
 
 export async function chat(
   messages: Array<{ role: string; content: string }>,
   temperature: number = 0.7,
-  model: string = 'gpt-4o'
+  model: string = process.env.OPENAI_MODEL || 'gpt-4o'
 ): Promise<string> {
   try {
     const response = await openai.chat.completions.create({
@@ -98,7 +99,7 @@ export async function chatWithJSON(
 ): Promise<any> {
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: process.env.OPENAI_MODEL || 'gpt-4o',
       messages: messages as any,
       temperature,
       response_format: { type: 'json_object' },
