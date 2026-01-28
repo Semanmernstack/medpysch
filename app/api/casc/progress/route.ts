@@ -15,7 +15,7 @@ export async function GET(request: Request) {
         { status: 400 }
       );
     }
-
+//////////goog///
     const progress = await getCASCProgress(userId);
 
     return NextResponse.json({ progress });
