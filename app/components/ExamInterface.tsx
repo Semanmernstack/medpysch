@@ -1,6 +1,4 @@
 
-
-
 // 'use client';
 
 // import { useState, useEffect, useRef } from 'react';
@@ -58,20 +56,30 @@
 //   const messagesEndRef = useRef<HTMLDivElement>(null);
 //   const speechToTextRef = useRef<SpeechToText | null>(null);
 //   const textToSpeechRef = useRef<TextToSpeech | null>(null);
-//   const timerRef = useRef<NodeJS.Timeout | null>(null); // Add timer ref
+//   const timerRef = useRef<NodeJS.Timeout | null>(null);
+//   const hasSpokenInitialMessage = useRef(false); // ✅ NEW: Track if initial message was spoken
 
 //   // Initialize voice services
 //   useEffect(() => {
 //     speechToTextRef.current = new SpeechToText();
 //     textToSpeechRef.current = new TextToSpeech();
 
-//     // Speak initial patient message
-//     if (useTTS && textToSpeechRef.current?.isSupported()) {
+//     // ✅ Speak initial patient message ONLY ONCE
+//     if (useTTS && textToSpeechRef.current?.isSupported() && !hasSpokenInitialMessage.current) {
+//       hasSpokenInitialMessage.current = true; // ✅ Mark as spoken
+      
 //       setTimeout(() => {
 //         const emotionalState = sessionData.patient_profile?.emotional_state || 'calm';
+//         const patientProfile = {
+//           age: sessionData.patient_profile?.age || 30,
+//           gender: sessionData.patient_profile?.gender || 'female',
+//           name: sessionData.patient_profile?.name || 'Patient'
+//         };
+        
 //         textToSpeechRef.current?.speakWithEmotion(
 //           sessionData.initial_message || 'Hello doctor...',
-//           emotionalState
+//           emotionalState,
+//           patientProfile
 //         );
 //       }, 500);
 //     }
@@ -79,30 +87,41 @@
 //     return () => {
 //       textToSpeechRef.current?.stop();
 //       speechToTextRef.current?.stopListening();
-//       if (timerRef.current) clearInterval(timerRef.current); // Clean up timer
+//       if (timerRef.current) clearInterval(timerRef.current);
 //     };
-//   }, []);
+//   }, []); // ✅ Empty dependency array - run only once
 
 //   // Auto-scroll to bottom
 //   useEffect(() => {
 //     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
 //   }, [messages]);
 
-//   // Text-to-speech for patient responses
+//   // ✅ Text-to-speech for NEW patient responses only (not initial message)
 //   useEffect(() => {
 //     if (useTTS && textToSpeechRef.current?.isSupported()) {
 //       const lastMessage = messages[messages.length - 1];
+      
+//       // ✅ Skip initial message (id '1') to prevent echo
 //       if (lastMessage.role === 'patient' && lastMessage.id !== '1') {
 //         const emotionalState = sessionData.patient_profile?.emotional_state || 'calm';
+        
+//         // Pass patient profile for proper voice selection
+//         const patientProfile = {
+//           age: sessionData.patient_profile?.age || 30,
+//           gender: sessionData.patient_profile?.gender || 'female',
+//           name: sessionData.patient_profile?.name || 'Patient'
+//         };
+        
 //         textToSpeechRef.current.speakWithEmotion(
 //           lastMessage.content,
-//           emotionalState
+//           emotionalState,
+//           patientProfile
 //         );
 //       }
 //     }
-//   }, [messages, useTTS]);
+//   }, [messages, useTTS]); // ✅ Removed sessionData.patient_profile from dependencies
 
-//   // Timer countdown - FIXED to stop at zero
+//   // Timer countdown
 //   useEffect(() => {
 //     if (timeRemaining <= 0) {
 //       setIsTimeout(true);
@@ -135,7 +154,7 @@
 //     };
 //   }, [timeRemaining]);
 
-//   // Voice input handlers
+//   // Voice input handlers with AUTOMATIC send
 //   const handleStartListening = () => {
 //     if (!speechToTextRef.current?.isSupported()) {
 //       alert('Speech recognition is not supported in your browser. Please use Chrome or Edge.');
@@ -147,14 +166,17 @@
 
 //     speechToTextRef.current.startListening(
 //       (transcript) => {
+//         // This callback is triggered when silence timer (1500ms) completes
 //         setCurrentTranscript(transcript);
 //         setIsListening(false);
-//         // Auto-send after getting transcript
-//         setTimeout(() => {
+        
+//         // Auto-send after getting final transcript
+//         if (transcript.trim()) {
 //           handleSendMessage(transcript);
-//         }, 500);
+//         }
 //       },
 //       () => {
+//         // Called when listening ends
 //         setIsListening(false);
 //       }
 //     );
@@ -415,11 +437,11 @@
 //                 {/* Instruction */}
 //                 <div className="text-center">
 //                   <p className="text-lg font-semibold text-gray-800">
-//                     {isListening ? '🎤 Listening... Speak now' : '🎤 Click microphone to speak'}
+//                     {isListening ? '🎤 Listening... Speak naturally' : '🎤 Click microphone to speak'}
 //                   </p>
 //                   <p className="text-sm text-gray-600 mt-1">
 //                     {isListening
-//                       ? 'Your voice is being recorded'
+//                       ? 'Your message will send automatically after 1.5 seconds of silence'
 //                       : 'Press the button and speak naturally to the patient'}
 //                   </p>
 //                 </div>
