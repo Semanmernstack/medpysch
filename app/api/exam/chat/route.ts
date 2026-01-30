@@ -58,20 +58,32 @@
 
 //     console.log('💬 Doctor said:', message);
 
-//     // Analyze doctor's tone (REAL-TIME)
+//     // Analyze doctor's tone (SILENTLY - not returned to frontend)
 //     const examiner = new ExaminerAgent(session.case_data);
 //     const toneAnalysis = await examiner.analyzeDoctorTone(
 //       message,
 //       patientContext
 //     );
 
-//     // Add doctor's message
+//     console.log('🎯 Tone analysis (stored silently):', toneAnalysis);
+
+//     // Store tone analysis in session history (NEW)
+//     if (!session.tone_history) {
+//       session.tone_history = [];
+//     }
+//     session.tone_history.push({
+//       ...toneAnalysis,
+//       question: message,
+//       timestamp: new Date().toISOString(),
+//     });
+
+//     // Add doctor's message (WITHOUT tone_analysis in the message)
 //     const doctorMsg: Message = {
 //       id: uuidv4(),
 //       role: 'doctor',
 //       content: message,
 //       timestamp: new Date().toISOString(),
-//       tone_analysis: toneAnalysis,
+//       // tone_analysis removed - don't store it in message
 //     };
 //     session.conversation.push(doctorMsg);
 
@@ -102,17 +114,13 @@
 //     // Update session in Redis
 //     await updateSession(session_id, session);
 
+//     // Return response WITHOUT tone_analysis (hidden during exam)
 //     return NextResponse.json({
 //       response: responseText,
 //       status: 'active',
 //       elapsed_seconds: elapsed,
 //       remaining_seconds: Math.max(0, 420 - elapsed),
-//       tone_analysis: {
-//         empathy_level: toneAnalysis.empathy_level,
-//         tone: toneAnalysis.tone,
-//         communication_score: toneAnalysis.communication_score,
-//         concerns: toneAnalysis.concerns,
-//       },
+//       // NO tone_analysis field - feedback completely hidden
 //     });
 //   } catch (error: any) {
 //     console.error('❌ Chat error:', error);
@@ -122,6 +130,7 @@
 //     );
 //   }
 // }
+
 
 import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
